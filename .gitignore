@@ -1,0 +1,39 @@
+# Laravel специфичные файлы
+/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+/.env
+/.env.backup
+/.phpunit.result.cache
+/docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+
+# OS файлы
+.DS_Store
+Thumbs.db
+
+# Логи
+*.log
+
+# Кэш Laravel
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Временные файлы
+*.tmp
+*.temp
+
+# Backup файлы
+*.backup
+*.bak
+
+# Session files
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
