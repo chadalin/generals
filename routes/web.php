@@ -77,6 +77,7 @@ Route::middleware('auth')->prefix('countries')->group(function () {
 
 // General Routes
 Route::middleware('auth')->prefix('generals')->group(function () {
+    Route::get('/', [GeneralController::class, 'index'])->name('generals.index'); 
     Route::get('{general}', [GeneralController::class, 'show'])->name('generals.show');
     Route::post('hire/{game}', [GeneralController::class, 'hire'])->name('generals.hire');
     Route::post('{general}/order', [GeneralController::class, 'updateOrder'])->name('generals.update-order');
@@ -89,9 +90,15 @@ Route::middleware('auth')->prefix('generals')->group(function () {
 // Battle Routes
 Route::middleware('auth')->prefix('battles')->group(function () {
     Route::get('/', [BattleController::class, 'index'])->name('battles.index');
+    // Добавьте эту строку
     Route::get('{battle}', [BattleController::class, 'show'])->name('battles.show');
     Route::post('initiate/{game}', [BattleController::class, 'initiateBattle'])->name('battles.initiate');
     Route::post('{battle}/resolve', [BattleController::class, 'resolveBattle'])->name('battles.resolve');
     Route::get('{battle}/log', [BattleController::class, 'getBattleLog'])->name('battles.log');
     Route::get('game/{game}', [BattleController::class, 'getGameBattles'])->name('battles.game-battles');
+});
+
+
+Route::middleware('auth')->prefix('api')->group(function () {
+    Route::get('games/{game}/map-data', [GameController::class, 'getMapData'])->name('api.games.map-data');
 });

@@ -10,10 +10,22 @@ class Player extends Model
     use HasFactory;
 
     protected $fillable = [
-        'game_id', 'user_id', 'country_id', 'username', 'money', 'grain',
-        'scientists', 'soldiers', 'peasants', 'research_military', 
-        'research_economy', 'research_science', 'is_ready', 'is_ai', 'ai_difficulty'
-    ];
+    'game_id',
+    'user_id',
+    'country_id',
+    'username',
+    'money',
+    'grain',
+    'scientists',
+    'soldiers',
+    'peasants',
+    'research_military',
+    'research_economy',
+    'research_science',
+    'is_ready',
+    'is_ai',
+    'ai_difficulty',
+];
 
     public function game()
     {

@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Auth;
 
 class GeneralController extends Controller
 {
+
+
+
+    public function index()
+{
+    // Получите всех генералов текущего пользователя или все доступные
+    $generals = auth()->user()->generals ?? collect(); // Логика зависит от вашей структуры данных
+    
+    return view('generals.index', compact('generals'));
+} 
     public function show(General $general)
     {
         $this->authorize('view', $general);
@@ -19,47 +29,61 @@ class GeneralController extends Controller
         return view('generals.show', compact('general'));
     }
 
-    public function hire(Request $request, Game $game)
-    {
-        $player = $game->players()->where('user_id', Auth::id())->firstOrFail();
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+   public function hire(Request $request, Game $game)
+{
+    $player = $game->players()->where('user_id', Auth::id())->firstOrFail();
+    
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+    ]);
 
-        $cost = 1000; // Базовая стоимость генерала
+    $cost = 1000; // Базовая стоимость генерала
 
-        if ($player->money < $cost) {
-            return response()->json(['error' => 'Not enough money to hire general'], 422);
-        }
-
-        if ($player->generals()->count() >= 10) {
-            return response()->json(['error' => 'Maximum number of generals reached'], 422);
-        }
-
-        // Генерируем характеристики генерала
-        $stats = $this->generateGeneralStats();
-
-        $general = General::create([
-            'player_id' => $player->id,
-            'country_id' => $player->country_id,
-            'name' => $validated['name'],
-            'speed' => $stats['speed'],
-            'attack' => $stats['attack'],
-            'defense' => $stats['defense'],
-            'cost' => $cost,
-            'order' => 'train',
-            'soldiers_count' => 0,
-        ]);
-
-        $player->decrement('money', $cost);
-
-        return response()->json([
-            'success' => true,
-            'general' => $general,
-            'remaining_money' => $player->money,
-        ]);
+    if ($player->money < $cost) {
+        return response()->json(['error' => 'Not enough money to hire general'], 422);
     }
+
+    if ($player->generals()->count() >= 10) {
+        return response()->json(['error' => 'Maximum number of generals reached'], 422);
+    }
+
+    // Генерируем характеристики генерала
+    $stats = $this->generateGeneralStats();
+
+    $general = General::create([
+        'player_id' => $player->id,
+        'country_id' => $player->country_id,
+        'name' => $validated['name'],
+        'speed' => $stats['speed'],
+        'attack' => $stats['attack'],
+        'defense' => $stats['defense'],
+        'cost' => $cost,
+        'order' => 'train',
+        'soldiers_count' => 0,
+    ]);
+
+    $player->decrement('money', $cost);
+
+    // Формируем ответ с явными английскими ключами
+    return response()->json([
+        'success' => true,
+        'general' => [
+            'id' => $general->id,
+            'player_id' => $general->player_id,
+            'country_id' => $general->country_id,
+            'name' => $general->name,
+            'speed' => $general->speed,
+            'attack' => $general->attack,
+            'defense' => $general->defense,
+            'cost' => $general->cost,
+            'order' => $general->order,
+            'soldiers_count' => $general->soldiers_count,
+            'created_at' => $general->created_at->toDateTimeString(),
+            'updated_at' => $general->updated_at->toDateTimeString(),
+        ],
+        'remaining_money' => $player->money,
+    ]);
+}
 
     public function updateOrder(Request $request, General $general)
     {
@@ -141,22 +165,21 @@ class GeneralController extends Controller
         ]);
     }
 
-    public dismiss(General $general)
-    {
-        $this->authorize('delete', $general);
-        
-        $refund = $general->cost * 0.5; // 50% возврат стоимости
+   public function dismiss(General $general)
+{
+    $this->authorize('delete', $general);
+    
+    $refund = $general->cost * 0.5; // 50% возврат стоимости
 
-        $general->player->increment('money', $refund);
-        $general->delete();
+    $general->player->increment('money', $refund);
+    $general->delete();
 
-        return response()->json([
-            'success' => true,
-            'refund' => $refund,
-            'remaining_money' => $general->player->money,
-        ]);
-    }
-
+    return response()->json([
+        'success' => true,
+        'refund' => $refund,
+        'remaining_money' => $general->player->money,
+    ]);
+}
     public function getBattleHistory(General $general)
     {
         $this->authorize('view', $general);

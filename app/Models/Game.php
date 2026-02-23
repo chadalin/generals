@@ -9,14 +9,30 @@ class Game extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name', 'max_players', 'current_players', 'map_size', 
-        'year', 'turn_duration', 'is_private', 'password', 'status', 'settings'
-    ];
+    // app/Models/Game.php
+protected $fillable = [
+    'name',
+    'max_players',
+    'map_size',
+    'map_width',
+    'map_height',
+    'turn_duration',
+    'ai_difficulty',
+    'start_year',
+    'current_year',
+    'is_private',
+    'password',
+    'random_countries',
+    'fog_of_war',
+    'current_players',
+    'status',
+    'map_data',
+];
 
-    protected $casts = [
-        'settings' => 'array',
-    ];
+protected $casts = [
+    'is_private' => 'boolean',
+    'settings' => 'array', // автоматически декодирует JSON при доступе
+];
 
     public function players()
     {
